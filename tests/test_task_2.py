@@ -1,7 +1,8 @@
 """
 This module contains tests for the filter_file function.
 It checks different cases with file-like objects and real file paths,
-and validates whether the filtering of lines based on search and stop words works as expected.
+and validates whether the filtering of lines based on search
+and stop words works as expected.
 """
 
 import io
@@ -70,7 +71,8 @@ def test_filter_file(
     file_name, file_object, search_words, stop_words, expected_result
 ):
     """
-        Test the filter_file function with different input sources (file_name or file_object),
+        Test the filter_file function with different input
+        sources (file_name or file_object),
         ensuring it returns the correct lines based on search and stop words.
     """
     result = list(
@@ -81,8 +83,8 @@ def test_filter_file(
 
 def test_filter_file_with_incorrect_file_data():
     """
-        Test the filter_file function with incorrect input, ensuring it raises a ValueError
-        when both file_name and file_object are None.
+        Test the filter_file function with incorrect input, ensuring
+        it raises a ValueError when both file_name and file_object are None.
     """
     with pytest.raises(ValueError):
         list(
