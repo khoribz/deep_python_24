@@ -58,7 +58,7 @@ def test_predict_message_mood(
         expected_result (str): The expected mood result based
         on the prediction and thresholds.
     """
-    with patch('hw_1.src.task_1.SomeModel.predict', return_value=predict_value):
+    with patch('hw_1.src.predict_message.SomeModel.predict', return_value=predict_value):
         assert predict_message_mood(
             message=message,
             **(
