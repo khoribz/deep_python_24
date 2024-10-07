@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
-from HW_1.src.task_1 import predict_message_mood
+from hw_1.src.predict_message import predict_message_mood
 
 
 @pytest.mark.parametrize(
@@ -58,7 +58,7 @@ def test_predict_message_mood(
         expected_result (str): The expected mood result based
         on the prediction and thresholds.
     """
-    with patch('src.task_1.SomeModel.predict', return_value=predict_value):
+    with patch('hw_1.src.task_1.SomeModel.predict', return_value=predict_value):
         assert predict_message_mood(
             message=message,
             **(
