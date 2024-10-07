@@ -26,7 +26,7 @@ def process_json(
             callback (Callable[[str, str], None] | None): A callback function to be
             called when a token is found.
     """
-    data = orjson.loads(json_str) # pylint: disable=maybe-no-member
+    data = orjson.loads(json_str)  # pylint: disable=maybe-no-member
     required_keys = required_keys or []
     tokens = tokens or []
     if callback is None:
@@ -37,3 +37,5 @@ def process_json(
             for token in tokens:
                 if token.lower() in value.lower():
                     callback(key, token)
+
+    return None
