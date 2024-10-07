@@ -84,7 +84,6 @@ def test_check_str_exception():
         )
 
 
-
 def test_check_int_success():
     """
     Test that check_int returns True when a valid integer is provided
