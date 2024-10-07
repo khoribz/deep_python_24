@@ -12,7 +12,6 @@ Functions:
     as 'BAD', 'GOOD', or 'EXCELLENT'.
 """
 
-import random
 from enum import Enum
 
 
@@ -33,7 +32,11 @@ class SomeModel:  # pylint: disable=R0903
                 Returns:
                     float: A sentiment score between 0 and 1.
         """
-        return random.uniform(0, 1) / max(len(message), 1)
+        alpha_count = 0
+        for letter in message:
+            if letter.isalpha():
+                alpha_count += 1
+        return alpha_count / len(message)
 
 
 class GradeName(str, Enum):
