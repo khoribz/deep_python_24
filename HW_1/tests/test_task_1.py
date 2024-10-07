@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
-from src.task_1 import predict_message_mood
+from HW_1.src.task_1 import predict_message_mood
 
 
 @pytest.mark.parametrize(

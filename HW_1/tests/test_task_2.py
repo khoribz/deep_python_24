@@ -7,7 +7,7 @@ and stop words works as expected.
 
 import io
 import pytest
-from src.task_2 import filter_file
+from HW_1.src.task_2 import filter_file
 
 
 @pytest.mark.parametrize(
