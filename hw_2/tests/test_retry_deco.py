@@ -10,7 +10,7 @@ The tests cover:
 
 from unittest.mock import patch
 
-from hw_2.src.retry_deco import add, check_str, check_int
+from hw_2.src.retry_deco import add, check_str, check_int, retry_deco
 
 
 def test_add_success():
@@ -109,3 +109,102 @@ def test_check_int_expected_exception():
             'run "check_int" with keyword kwargs = {\'value\': None}, '
             'attempt = 1, exception = ValueError'
         )
+
+
+def test_zero_max_attempts():
+    """
+    Test that the function is not retried when max_attempts is set to 0.
+    """
+    @retry_deco(0)
+    def raise_value_error():
+        raise ValueError
+
+    with patch('builtins.print') as mock_print:
+        result = raise_value_error()
+        assert result is None
+        mock_print.assert_not_called()
+
+
+def test_empty_expected_exceptions():
+    """
+    Test that the function retries normally if expected_exceptions is None or an empty list.
+    """
+    @retry_deco(3, [])
+    def raise_value_error():
+        raise ValueError
+
+    with patch('builtins.print') as mock_print:
+        result = raise_value_error()
+        assert result is None
+        assert mock_print.call_count == 3
+        mock_print.assert_any_call(
+            'run "raise_value_error" with attempt = 1, exception = ValueError'
+        )
+        mock_print.assert_any_call(
+            'run "raise_value_error" with attempt = 2, exception = ValueError'
+        )
+        mock_print.assert_any_call(
+            'run "raise_value_error" with attempt = 3, exception = ValueError'
+        )
+
+
+def test_success_no_retries():
+    """
+    Test that the function runs successfully without retries if no exception is raised.
+    """
+    @retry_deco(3)
+    def return_success():
+        return 'success'
+
+    with patch('builtins.print') as mock_print:
+        result = return_success()
+        assert result == 'success'
+        mock_print.assert_called_once_with(
+            'run "return_success" with attempt = 1, result = success'
+        )
+
+
+def test_unexpected_exception():
+    """
+    Test that the function retries when an unexpected exception occurs (not in expected_exceptions).
+    """
+    @retry_deco(3, [ValueError])
+    def fail_with_unexpected_exception():
+        raise TypeError
+
+    with patch('builtins.print') as mock_print:
+        result = fail_with_unexpected_exception()
+        assert result is None
+        assert mock_print.call_count == 3
+        mock_print.assert_any_call(
+            'run "fail_with_unexpected_exception" with attempt = 1, exception = TypeError'
+        )
+        mock_print.assert_any_call(
+            'run "fail_with_unexpected_exception" with attempt = 2, exception = TypeError'
+        )
+        mock_print.assert_any_call(
+            'run "fail_with_unexpected_exception" with attempt = 3, exception = TypeError'
+        )
+
+
+def test_retry_success_after_failure():
+    """
+    Test that the function retries and succeeds after an initial failure.
+    """
+    call_count = 0
+
+    @retry_deco(3)
+    def fail_two_times():
+        nonlocal call_count
+        call_count += 1
+        if call_count < 2:
+            raise ValueError
+        return 'success'
+
+    with patch('builtins.print') as mock_print:
+        result = fail_two_times()
+        assert result == 'success'
+        assert call_count == 2
+        assert mock_print.call_count == 2
+        mock_print.assert_any_call('run "fail_two_times" with attempt = 1, exception = ValueError')
+        mock_print.assert_any_call('run "fail_two_times" with attempt = 2, result = success')
