@@ -33,6 +33,13 @@ class Mocks:  # pylint: disable=too-few-public-methods
     ['json_data', 'required_keys', 'tokens', 'callback_expected_called_args'],
     [
         {
+            'test_name': 'Empty JSON string',
+            'json_data': '{}',
+            'required_keys': ['key'],
+            'tokens': ['value'],
+            'callback_expected_called_args': [],
+        },
+        {
             'test_name': 'There is a match between key and token, callback will be called',
             'json_data': dumps({'key': 'some value'}).decode('utf-8'),
             'required_keys': ['key'],
@@ -62,6 +69,13 @@ class Mocks:  # pylint: disable=too-few-public-methods
             'required_keys': ['key'],
             'tokens': ['strange_value'],
             'callback_expected_called_args': [],
+        },
+        {
+            'test_name': 'Empty required keys and tokens',
+            'json_data': dumps({'key': 'some value'}).decode('utf-8'),
+            'required_keys': [],
+            'tokens': [],
+            'callback_expected_called_args': []
         },
     ]
 )
