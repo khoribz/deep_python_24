@@ -10,7 +10,7 @@ The tests cover:
 
 from unittest.mock import patch
 
-from hw_2.src.retry_deco import add, check_str, check_int, retry_deco
+from hw_2.retry_deco import add, check_str, check_int, retry_deco
 
 
 def test_add_success():
