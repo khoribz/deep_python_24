@@ -4,8 +4,6 @@ test cases and mock callbacks to ensure expected behavior.
 """
 
 from orjson import dumps
-import sys
-sys.path.append('.')
 
 from process_json import process_json
 from test_helpers import parametrize_with_dict

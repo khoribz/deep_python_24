@@ -7,9 +7,6 @@ and stop words works as expected.
 
 import io
 import pytest
-import sys
-sys.path.append('.')
-
 from file_generator import filter_file
 
 

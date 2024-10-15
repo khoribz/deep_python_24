@@ -11,8 +11,6 @@ The tests cover:
 from unittest.mock import patch
 
 import pytest
-import sys
-sys.path.append('.')
 
 from retry_deco import add, check_str, check_int, retry_deco
 

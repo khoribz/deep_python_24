@@ -5,8 +5,6 @@ method to provide controlled outputs for different scenarios.
 """
 
 import pytest
-import sys
-sys.path.append('.')
 
 from predict_message import predict_message_mood
 
