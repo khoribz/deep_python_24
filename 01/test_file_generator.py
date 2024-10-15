@@ -50,7 +50,7 @@ from file_generator import filter_file
             ]
         ),
         (
-            './predict_message_text.txt',
+            './01/predict_message_text.txt',
             None,
             ['роза', 'упала'],
             ['азора', 'медведь'],
@@ -59,7 +59,7 @@ from file_generator import filter_file
             ]
         ),
         (
-            './predict_message_text.txt',
+            './01/predict_message_text.txt',
             None,
             ['роза', 'темном', 'цвела', 'заяц'],
             ['азора', 'медведь'],

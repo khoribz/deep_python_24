@@ -7,7 +7,7 @@ import pytest
 import sys
 sys.path.append('.')
 
-from test_helpers import parametrize_with_dict
+from test_parametrize_with_dict import parametrize_with_dict
 from custom_list import CustomList
 
 
