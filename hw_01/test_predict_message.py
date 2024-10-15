@@ -6,7 +6,7 @@ method to provide controlled outputs for different scenarios.
 
 import pytest
 
-from hw_1.predict_message import predict_message_mood
+from hw_01.predict_message import predict_message_mood
 
 
 @pytest.mark.parametrize(

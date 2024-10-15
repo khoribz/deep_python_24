@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 import pytest
 
-from hw_2.retry_deco import add, check_str, check_int, retry_deco
+from hw_02.retry_deco import add, check_str, check_int, retry_deco
 
 
 def test_add_success():

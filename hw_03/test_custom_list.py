@@ -5,8 +5,8 @@ representation and behavior when interacting with lists and numbers.
 """
 import pytest
 
-from hw_2.test_helpers import parametrize_with_dict
-from hw_3.custom_list import CustomList
+from hw_02.test_helpers import parametrize_with_dict
+from hw_03.custom_list import CustomList
 
 
 @parametrize_with_dict(

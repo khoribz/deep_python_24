@@ -4,8 +4,8 @@ test cases and mock callbacks to ensure expected behavior.
 """
 
 from orjson import dumps
-from hw_2.process_json import process_json
-from hw_2.test_helpers import parametrize_with_dict
+from hw_02.process_json import process_json
+from hw_02.test_helpers import parametrize_with_dict
 
 
 class Mocks:  # pylint: disable=too-few-public-methods
