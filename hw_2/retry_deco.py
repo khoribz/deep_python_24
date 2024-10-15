@@ -46,21 +46,19 @@ def retry_deco(
 
                 try:
                     result = func(*args, **kwargs)
+                except tuple(expected_exceptions or []) as e:
+                    function_info += f'expected exception = {type(e).__name__}'
+                    raise
                 except Exception as e:
                     function_info += f'exception = {type(e).__name__}'
-                    print(function_info)
-                    if (
-                        expected_exceptions is not None
-                        and isinstance(e, tuple(expected_exceptions))
-                    ):
-                        return None
                     attempt += 1
                     if attempt > max_attempts:
-                        return None
+                        raise
                 else:
                     function_info += f'result = {result}'
-                    print(function_info)
                     return result
+                finally:
+                    print(function_info)
             return None
         return wrapped
     return wrapper
