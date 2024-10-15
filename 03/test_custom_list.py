@@ -4,9 +4,11 @@ addition, subtraction, and comparison functionality, as well as its string
 representation and behavior when interacting with lists and numbers.
 """
 import pytest
+import sys
+sys.path.append('.')
 
-from hw_02.test_helpers import parametrize_with_dict
-from hw_03.custom_list import CustomList
+from test_helpers import parametrize_with_dict
+from custom_list import CustomList
 
 
 @parametrize_with_dict(

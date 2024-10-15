@@ -5,8 +5,10 @@ method to provide controlled outputs for different scenarios.
 """
 
 import pytest
+import sys
+sys.path.append('.')
 
-from hw_01.predict_message import predict_message_mood
+from predict_message import predict_message_mood
 
 
 @pytest.mark.parametrize(

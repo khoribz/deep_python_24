@@ -7,7 +7,10 @@ and stop words works as expected.
 
 import io
 import pytest
-from hw_01.file_generator import filter_file
+import sys
+sys.path.append('.')
+
+from file_generator import filter_file
 
 
 @pytest.mark.parametrize(
@@ -47,7 +50,7 @@ from hw_01.file_generator import filter_file
             ]
         ),
         (
-            './hw_01/predict_message_text.txt',
+            './predict_message_text.txt',
             None,
             ['роза', 'упала'],
             ['азора', 'медведь'],
@@ -56,7 +59,7 @@ from hw_01.file_generator import filter_file
             ]
         ),
         (
-            './hw_01/predict_message_text.txt',
+            './predict_message_text.txt',
             None,
             ['роза', 'темном', 'цвела', 'заяц'],
             ['азора', 'медведь'],

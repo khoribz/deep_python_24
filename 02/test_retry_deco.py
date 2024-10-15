@@ -11,8 +11,10 @@ The tests cover:
 from unittest.mock import patch
 
 import pytest
+import sys
+sys.path.append('.')
 
-from hw_02.retry_deco import add, check_str, check_int, retry_deco
+from retry_deco import add, check_str, check_int, retry_deco
 
 
 def test_add_success():
