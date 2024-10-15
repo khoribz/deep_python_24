@@ -77,6 +77,29 @@ class Mocks:  # pylint: disable=too-few-public-methods
             'tokens': [],
             'callback_expected_called_args': []
         },
+        {
+            'test_name': 'There is a match between key and several tokens, callback will be called twice',
+            'json_data': dumps({'key': 'some value'}).decode('utf-8'),
+            'required_keys': ['key'],
+            'tokens': ['value', 'some'],
+            'callback_expected_called_args': [('key', 'value'), ('key', 'some')]
+        },
+        {
+            'test_name': 'There is a match between key and several tokens with case-insensivity, '
+                         'callback will be called',
+            'json_data': dumps({'key': 'sOme vAlue'}).decode('utf-8'),
+            'required_keys': ['key'],
+            'tokens': ['valUe', 'Some'],
+            'callback_expected_called_args': [('key', 'valUe'), ('key', 'Some')]
+        },
+        {
+            'test_name': 'There is a match between key and token with case-insensivity, '
+                         'callback will be called twice',
+            'json_data': dumps({'key': 'dssdd sOmeE vAlu'}).decode('utf-8'),
+            'required_keys': ['key'],
+            'tokens': ['valUe', 'sOmeE'],
+            'callback_expected_called_args': [('key', 'sOmeE')]
+        },
     ]
 )
 def test_process_json(json_data, required_keys, tokens, callback_expected_called_args):

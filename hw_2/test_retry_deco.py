@@ -10,6 +10,8 @@ The tests cover:
 
 from unittest.mock import patch
 
+import pytest
+
 from hw_2.retry_deco import add, check_str, check_int, retry_deco
 
 
@@ -67,21 +69,22 @@ def test_check_str_exception():
     Test that check_str raises a ValueError when the value is None,
     and that retry_deco retries the function 3 times, printing the correct output.
     """
-    with patch('builtins.print') as mock_print:
-        check_str(value=None)
-        assert mock_print.call_count == 3
-        mock_print.assert_any_call(
-            'run "check_str" with keyword kwargs = {\'value\': None}, '
-            'attempt = 1, exception = ValueError'
-        )
-        mock_print.assert_any_call(
-            'run "check_str" with keyword kwargs = {\'value\': None}, '
-            'attempt = 2, exception = ValueError'
-        )
-        mock_print.assert_any_call(
-            'run "check_str" with keyword kwargs = {\'value\': None}, '
-            'attempt = 3, exception = ValueError'
-        )
+    with pytest.raises(ValueError):
+        with patch('builtins.print') as mock_print:
+            check_str(value=None)
+            assert mock_print.call_count == 3
+            mock_print.assert_any_call(
+                'run "check_str" with keyword kwargs = {\'value\': None}, '
+                'attempt = 1, exception = ValueError'
+            )
+            mock_print.assert_any_call(
+                'run "check_str" with keyword kwargs = {\'value\': None}, '
+                'attempt = 2, exception = ValueError'
+            )
+            mock_print.assert_any_call(
+                'run "check_str" with keyword kwargs = {\'value\': None}, '
+                'attempt = 3, exception = ValueError'
+            )
 
 
 def test_check_int_success():
@@ -103,12 +106,13 @@ def test_check_int_expected_exception():
     Test that check_int raises a ValueError and stops retrying after the first attempt,
     printing the correct output when an expected exception occurs.
     """
-    with patch('builtins.print') as mock_print:
-        check_int(value=None)
-        mock_print.assert_called_once_with(
-            'run "check_int" with keyword kwargs = {\'value\': None}, '
-            'attempt = 1, exception = ValueError'
-        )
+    with pytest.raises(ValueError):
+        with patch('builtins.print') as mock_print:
+            check_int(value=None)
+            mock_print.assert_called_once_with(
+                'run "check_int" with keyword kwargs = {\'value\': None}, '
+                'attempt = 1, expected exception = ValueError'
+            )
 
 
 def test_zero_max_attempts():
@@ -133,19 +137,20 @@ def test_empty_expected_exceptions():
     def raise_value_error():
         raise ValueError
 
-    with patch('builtins.print') as mock_print:
-        result = raise_value_error()
-        assert result is None
-        assert mock_print.call_count == 3
-        mock_print.assert_any_call(
-            'run "raise_value_error" with attempt = 1, exception = ValueError'
-        )
-        mock_print.assert_any_call(
-            'run "raise_value_error" with attempt = 2, exception = ValueError'
-        )
-        mock_print.assert_any_call(
-            'run "raise_value_error" with attempt = 3, exception = ValueError'
-        )
+    with pytest.raises(ValueError):
+        with patch('builtins.print') as mock_print:
+            result = raise_value_error()
+            assert result is None
+            assert mock_print.call_count == 3
+            mock_print.assert_any_call(
+                'run "raise_value_error" with attempt = 1, exception = ValueError'
+            )
+            mock_print.assert_any_call(
+                'run "raise_value_error" with attempt = 2, exception = ValueError'
+            )
+            mock_print.assert_any_call(
+                'run "raise_value_error" with attempt = 3, exception = ValueError'
+            )
 
 
 def test_success_no_retries():
@@ -172,19 +177,20 @@ def test_unexpected_exception():
     def fail_with_unexpected_exception():
         raise TypeError
 
-    with patch('builtins.print') as mock_print:
-        result = fail_with_unexpected_exception()
-        assert result is None
-        assert mock_print.call_count == 3
-        mock_print.assert_any_call(
-            'run "fail_with_unexpected_exception" with attempt = 1, exception = TypeError'
-        )
-        mock_print.assert_any_call(
-            'run "fail_with_unexpected_exception" with attempt = 2, exception = TypeError'
-        )
-        mock_print.assert_any_call(
-            'run "fail_with_unexpected_exception" with attempt = 3, exception = TypeError'
-        )
+    with pytest.raises(TypeError):
+        with patch('builtins.print') as mock_print:
+            result = fail_with_unexpected_exception()
+            assert result is None
+            assert mock_print.call_count == 3
+            mock_print.assert_any_call(
+                'run "fail_with_unexpected_exception" with attempt = 1, exception = TypeError'
+            )
+            mock_print.assert_any_call(
+                'run "fail_with_unexpected_exception" with attempt = 2, exception = TypeError'
+            )
+            mock_print.assert_any_call(
+                'run "fail_with_unexpected_exception" with attempt = 3, exception = TypeError'
+            )
 
 
 def test_retry_success_after_failure():
