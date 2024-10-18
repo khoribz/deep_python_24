@@ -3,10 +3,15 @@ This module contains tests for the CustomList class, which verifies its
 addition, subtraction, and comparison functionality, as well as its string
 representation and behavior when interacting with lists and numbers.
 """
+
 import pytest
 
 from test_parametrize_with_dict import parametrize_with_dict
 from custom_list import CustomList
+
+
+def transform_to_list(value: CustomList | list | int) -> list:
+    return list(value) if isinstance(value, (list, CustomList)) else [value]
 
 
 @parametrize_with_dict(
@@ -139,11 +144,18 @@ def test_custom_list_add(first_operand, second_operand, expected_result, expecte
         Test addition of CustomList instances and lists/numbers.
         Verifies the result and ensures immutability of the original lists.
     """
+    first_operand_copy = transform_to_list(first_operand)
+    second_operand_copy = transform_to_list(second_operand)
     result = first_operand + second_operand
+
     assert result == expected_result
+    assert transform_to_list(result) == transform_to_list(expected_result)
     assert result is not first_operand
     assert result is not second_operand
     assert str(result) == expected_str_result
+
+    assert first_operand_copy == transform_to_list(first_operand)
+    assert second_operand_copy == transform_to_list(second_operand)
 
 
 @parametrize_with_dict(
@@ -284,11 +296,19 @@ def test_custom_list_sub(first_operand, second_operand, expected_result, expecte
         Test subtraction of CustomList instances and lists/numbers.
         Verifies the result and ensures immutability of the original lists.
     """
+    first_operand_copy = transform_to_list(first_operand)
+    second_operand_copy = transform_to_list(second_operand)
     result = first_operand - second_operand
+
     assert result == expected_result
+    assert transform_to_list(result) == transform_to_list(expected_result)
+
     assert result is not first_operand
     assert result is not second_operand
     assert str(result) == expected_str_result
+
+    assert first_operand_copy == transform_to_list(first_operand)
+    assert second_operand_copy == transform_to_list(second_operand)
 
 
 def test_custom_list():
@@ -339,6 +359,13 @@ def test_custom_list():
             'first_operand': CustomList([1, 2, 3]),
             'second_operand': CustomList(),
             'expected_result': False,
+        },
+        {
+            'case_id': 4,
+            'test_name': 'eq: equal sum, but different elements',
+            'first_operand': CustomList([1, 2, 3]),
+            'second_operand': CustomList([2, 2, 1, 1]),
+            'expected_result': True,
         },
     ]
 )
