@@ -11,6 +11,11 @@ from custom_list import CustomList
 
 
 def transform_to_list(value: CustomList | list | int) -> list:
+    """
+    Transforms a CustomList or int to a list.
+    :param value: CustomList or int or list
+    :return: list
+    """
     return list(value) if isinstance(value, (list, CustomList)) else [value]
 
 
