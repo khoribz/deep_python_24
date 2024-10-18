@@ -28,7 +28,6 @@ class CustomList(list):
         if values is None:
             values = []
         super().__init__(values)
-        self.sum = sum(values)
 
     def _operate(self, other: list[int] | int, operator: Callable[[int, int], int]) -> CustomList:
         """
@@ -97,7 +96,7 @@ class CustomList(list):
             :return: True if sums are equal, False otherwise.
         """
         if isinstance(other, CustomList):
-            return self.sum == other.sum
+            return sum(self) == sum(other)
 
         raise NotImplementedError
 
@@ -118,7 +117,7 @@ class CustomList(list):
             :return: True if current CustomList sum is greater, False otherwise.
         """
         if isinstance(other, CustomList):
-            return self.sum > other.sum
+            return sum(self) > sum(other)
 
         raise NotImplementedError
 
