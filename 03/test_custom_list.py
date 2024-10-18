@@ -400,6 +400,13 @@ def test_custom_list_eq(first_operand, second_operand, expected_result):
             'second_operand': CustomList(),
             'expected_result': False,
         },
+        {
+            'case_id': 3,
+            'test_name': 'ne: equal sum, but different elements',
+            'first_operand': CustomList([1, 2, 3]),
+            'second_operand': CustomList([2, 2, 1, 1]),
+            'expected_result': False,
+        },
     ]
 )
 def test_custom_list_ne(first_operand, second_operand, expected_result):
