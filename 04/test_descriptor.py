@@ -50,18 +50,21 @@ def test_change_attributes():
     assert str(instrument) == "Instrument: Type - wind, Material - wood, Sound Register - medium"
     with pytest.raises(WrongInstrumentType):
         instrument.instrument_type = 'electronic'
+    assert instrument.instrument_type == 'wind'
 
     instrument.material = 'metal'
     assert instrument.material == 'metal'
     assert str(instrument) == "Instrument: Type - wind, Material - metal, Sound Register - medium"
     with pytest.raises(WrongMaterial):
         instrument.material = 'glass'
+    assert instrument.material == 'metal'
 
     instrument.sound_register = 'low'
     assert instrument.sound_register == 'low'
     assert str(instrument) == "Instrument: Type - wind, Material - metal, Sound Register - low"
     with pytest.raises(WrongSoundRegister):
         instrument.sound_register = 'ultra-high'
+    assert instrument.sound_register == 'low'
 
 
 def test_independent_objects_all_attributes():
