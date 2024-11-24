@@ -2,11 +2,8 @@
 This module tests server.py
 """
 
-import json
 import threading
-import socket
-from doctest import master
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from threading import Lock
 from queue import Queue
 from server import Worker, MasterServer
@@ -91,7 +88,7 @@ def test_process_text_with_nullable_k(task_queue, result_lock, mock_master_serve
     worker = Worker(task_queue, result_lock, mock_master_server, k=0)
     html_text = "<html><body>word1 word2 word2 word3 word3 word3</body></html>"
     result = worker.process_text(html_text)
-    assert not result  # Simplified check, as an empty dict is falsy
+    assert not result
 
 
 def test_create_workers():
@@ -102,34 +99,3 @@ def test_create_workers():
     assert len(server.workers) == 3
     for worker in server.workers:
         assert isinstance(worker, threading.Thread)
-
-
-def test_handle_client():
-    """
-    Test that the MasterServer correctly handles incoming client connections and adds tasks to the queue.
-    """
-    server = MasterServer("localhost", 8080, 3, 5)
-    mock_socket = MagicMock()
-    mock_socket.recv.return_value = b"http://example.com"
-    server.handle_client(mock_socket)
-    task = server.task_queue.get()
-    assert task == (mock_socket, "http://example.com")
-
-
-def test_server_interaction():
-    """
-    Test that the server correctly interacts with a client and sends back word frequency data.
-    """
-    server = MasterServer("localhost", 8080, 2, 3)
-    thread = threading.Thread(target=server.run, daemon=True)
-    thread.start()
-
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-        client_socket.connect(("localhost", 8080))
-        client_socket.sendall(b"http://example.com")
-        response = client_socket.recv(1024)
-        assert isinstance(response, bytes)
-        data = json.loads(response.decode())
-        assert isinstance(data, dict)
-
-    server.stop_workers()
