@@ -1,8 +1,10 @@
 """
 This module tests server.py
 """
-
+import json
+import socket
 import threading
+import time
 from unittest.mock import patch, MagicMock
 from threading import Lock
 from queue import Queue
@@ -111,3 +113,29 @@ def test_handle_client():
     server.handle_client(mock_socket)
     task = server.task_queue.get()
     assert task == (mock_socket, "http://example.com")
+
+
+@pytest.fixture
+def server():
+    """
+    Fixture that creates a MasterServer instance and starts it in a separate thread.
+    """
+    server = MasterServer("localhost", 8080, 2, 3)
+    thread = threading.Thread(target=server.run, daemon=True)
+    thread.start()
+    time.sleep(1)
+    yield server
+    server.stop_workers()
+
+
+def test_server_interaction(server):
+    """
+    Test that the server correctly interacts with a client and sends back word frequency data.
+    """
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+        client_socket.connect(("localhost", 8080))
+        client_socket.sendall(b"http://example.com")
+        response = client_socket.recv(1024)
+        assert isinstance(response, bytes)
+        data = json.loads(response.decode())
+        assert isinstance(data, dict)
