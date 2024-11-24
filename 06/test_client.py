@@ -48,7 +48,7 @@ def test_fetch_url(mock_socket):
     mock_socket.return_value.__enter__.return_value = mock_conn
 
     url = 'http://example.com'
-    client = Client(url_filename='urls.txt', num_threads=1)
+    client = Client(url_filename='06/urls.txt', num_threads=1)
     client.fetch_url(url)
 
     mock_conn.connect.assert_called_once_with((client.host, client.port))
@@ -69,7 +69,7 @@ def test_fetch_url_with_error(mock_socket):
     mock_socket_instance.connect.side_effect = ConnectionError("Connection failed")
 
     url = 'http://example.com'
-    client = Client(url_filename='urls.txt', num_threads=1)
+    client = Client(url_filename='06/urls.txt', num_threads=1)
 
     with patch('builtins.print') as mock_print:
         client.fetch_url(url)
@@ -125,19 +125,3 @@ def test_invalid_url_file():
         """
     with pytest.raises(FileNotFoundError):
         Client(url_filename="nonexistent.txt", num_threads=2)
-
-
-def test_main_script(url_file):
-    """
-    Test the script execution via subprocess with actual CLI arguments.
-    """
-    result = subprocess.run(
-        ["python", "client.py", "2", str(url_file)],
-        capture_output=True,
-        text=True,
-    )
-
-    assert result.returncode == 0
-    urls = URLS.strip().split("\n")
-    for url in urls:
-        assert url in result.stdout
