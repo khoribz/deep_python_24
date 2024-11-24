@@ -5,6 +5,7 @@ This module tests server.py
 import json
 import threading
 import socket
+from doctest import master
 from unittest.mock import patch, MagicMock
 from threading import Lock
 from queue import Queue
@@ -115,22 +116,14 @@ def test_handle_client():
     assert task == (mock_socket, "http://example.com")
 
 
-@pytest.fixture
-def server():
+def test_server_interaction():
     """
-    Fixture that creates a MasterServer instance and starts it in a separate thread.
+    Test that the server correctly interacts with a client and sends back word frequency data.
     """
     server = MasterServer("localhost", 8080, 2, 3)
     thread = threading.Thread(target=server.run, daemon=True)
     thread.start()
-    yield server
-    server.stop_workers()
 
-
-def test_server_interaction(server):
-    """
-    Test that the server correctly interacts with a client and sends back word frequency data.
-    """
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
         client_socket.connect(("localhost", 8080))
         client_socket.sendall(b"http://example.com")
@@ -138,3 +131,5 @@ def test_server_interaction(server):
         assert isinstance(response, bytes)
         data = json.loads(response.decode())
         assert isinstance(data, dict)
+
+    server.stop_workers()
