@@ -3,7 +3,7 @@ This module tests server.py
 """
 
 import threading
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from threading import Lock
 from queue import Queue
 from server import Worker, MasterServer
@@ -99,3 +99,15 @@ def test_create_workers():
     assert len(server.workers) == 3
     for worker in server.workers:
         assert isinstance(worker, threading.Thread)
+
+
+def test_handle_client():
+    """
+    Test that the MasterServer correctly handles incoming client connections and adds tasks to the queue.
+    """
+    server = MasterServer("localhost", 8080, 3, 5)
+    mock_socket = MagicMock()
+    mock_socket.recv.return_value = b"http://example.com"
+    server.handle_client(mock_socket)
+    task = server.task_queue.get()
+    assert task == (mock_socket, "http://example.com")
