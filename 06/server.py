@@ -64,7 +64,8 @@ class Worker(threading.Thread):
 
     def run(self):
         """
-        Processes tasks from the queue by fetching and analyzing URLs, then sends results to clients.
+        Processes tasks from the queue by fetching and analyzing URLs,
+        then sends results to clients.
         """
         while True:
             client_socket, url = self.task_queue.get()
@@ -107,7 +108,9 @@ class MasterServer:
         :param worker_count: Number of workers to initialize
         :return: List of initialized worker threads
         """
-        return [Worker(self.task_queue, self.result_lock, self, self.k) for _ in range(worker_count)]
+        return [
+            Worker(self.task_queue, self.result_lock, self, self.k) for _ in range(worker_count)
+        ]
 
     def start_workers(self):
         """
