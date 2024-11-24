@@ -2,7 +2,6 @@
     This module tests client.py
 """
 
-import subprocess
 
 from unittest.mock import patch, MagicMock
 
