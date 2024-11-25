@@ -73,7 +73,6 @@ def benchmark_class_creation(cls, n: int):
     return instances, end_time - start_time
 
 
-
 def benchmark_attribute_access_and_modification(instances):
     """
         Measure the time required to access and modify attributes of instances.
