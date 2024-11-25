@@ -14,6 +14,8 @@ It demonstrates how design choices affect performance.
 import time
 import weakref
 
+from memory_profiler import profile
+
 
 class RegularClass:
     """
@@ -93,16 +95,20 @@ def benchmark_attribute_access_and_modification(instances):
     return end_time - start_time
 
 
-if __name__ == '__main__':
-    N = 10_000_000
+@profile
+def main():
+    """
+        Provides benchmarks
+    """
+    n = 10_000_000
 
-    regular_instances, regular_creation_time = benchmark_class_creation(RegularClass, N)
+    regular_instances, regular_creation_time = benchmark_class_creation(RegularClass, n)
     regular_access_time = benchmark_attribute_access_and_modification(regular_instances)
 
-    slots_instances, slots_creation_time = benchmark_class_creation(SlotsClass, N)
+    slots_instances, slots_creation_time = benchmark_class_creation(SlotsClass, n)
     slots_access_time = benchmark_attribute_access_and_modification(slots_instances)
 
-    weakref_instances, weakref_creation_time = benchmark_class_creation(WeakRefClass, N)
+    weakref_instances, weakref_creation_time = benchmark_class_creation(WeakRefClass, n)
     weakref_access_time = benchmark_attribute_access_and_modification(weakref_instances)
 
     print(
@@ -117,3 +123,7 @@ if __name__ == '__main__':
         f"WeakRefClass: Creation Time: {weakref_creation_time:.5f}s, "
         f"Access/Modification Time: {weakref_access_time:.5f}s"
     )
+
+
+if __name__ == '__main__':
+    main()
