@@ -1,0 +1,16 @@
+2024-12-01 16:56:42,780 - DEBUG - SET - Try to set: a=1
+2024-12-01 16:56:42,781 - INFO - SET - Key added: a
+2024-12-01 16:56:42,781 - DEBUG - SET - Try to set: b=2
+2024-12-01 16:56:42,781 - INFO - SET - Key added: b
+2024-12-01 16:56:42,781 - DEBUG - GET - Try to find: a
+2024-12-01 16:56:42,781 - INFO - GET - Key accessed: a
+2024-12-01 16:56:42,781 - DEBUG - SET - Try to set: c=3
+2024-12-01 16:56:42,781 - INFO - SET - Key added: c
+2024-12-01 16:56:42,781 - DEBUG - SET - Try to set: d=4
+2024-12-01 16:56:42,781 - INFO - SET - Key added: d, Evicted least recently used key: {evicted_key}
+2024-12-01 16:56:42,781 - DEBUG - GET - Try to find: b
+2024-12-01 16:56:42,781 - INFO - GET - Key not found: b
+2024-12-01 16:56:42,781 - DEBUG - SET - Try to set: a=5
+2024-12-01 16:56:42,781 - INFO - SET - Key updated: a
+2024-12-01 16:56:42,781 - DEBUG - GET - Try to find: d
+2024-12-01 16:56:42,781 - INFO - GET - Key accessed: d
