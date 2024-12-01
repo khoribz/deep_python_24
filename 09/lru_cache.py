@@ -66,15 +66,15 @@ class LRUCache:
             Returns:
                 V | None: The associated value if the key exists, or None if not.
         """
-        logger.debug(f"GET - Try to find: {key}")
+        logger.debug("GET - Try to find: %s", str(key))
 
         if (value := self.__data.get(key)) is None:
-            logger.info(f"GET - Key not found: {key}")
+            logger.info("GET - Key not found: %s", str(key))
             return None
 
         self.__data.pop(key)
         self.__data[key] = value
-        logger.info(f"GET - Key accessed: {key}")
+        logger.info("GET - Key accessed: %s", str(key))
         return value
 
     def set(self, key: K, value: V) -> None:
@@ -89,7 +89,7 @@ class LRUCache:
             Raises:
                 TypeError: If the key is not hashable.
         """
-        logger.debug(f"SET - Try to set: {key}={value}")
+        logger.debug("SET - Try to set: %s=%s", str(key), str(value))
 
         if not isinstance(key, Hashable):
             logger.error('SET - Key must be hashable')
@@ -98,7 +98,7 @@ class LRUCache:
         if self.__data.get(key) is not None:
             self.__data.pop(key)
             self.__data[key] = value
-            logger.info(f"SET - Key updated: {key}")
+            logger.info("SET - Key updated: %s", str(key))
         else:
             self.__data[key] = value
             log_body = f"SET - Key added: {key}"
