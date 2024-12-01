@@ -4,6 +4,7 @@ The cache stores a fixed number of items, evicting the least recently used item 
 """
 from collections.abc import Hashable
 from typing import TypeVar
+from venv import logger
 
 from pydantic import BaseModel, field_validator, ValidationError
 
@@ -20,6 +21,7 @@ class Capacity(BaseModel):
     def validate_value(cls, value: int) -> int:
         """Validates that the capacity is non-negative."""
         if value < 0:
+            logger.error('Capacity must be non-negative')
             raise ValidationError('Incorrect value')
         return value
 
