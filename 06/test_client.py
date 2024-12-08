@@ -24,14 +24,15 @@ def url_file(tmp_path):
     return file
 
 
-def test_load_urls(url_file):
+def test_stream_urls(url_file):
     """
-       Test the Client's ability to load URLs from a file.
+    Test the stream_urls method.
+    """
+    client = Client(url_filename=url_file, num_threads=2)
+    expected_urls = URLS.strip().split('\n')
 
-       :param url_file: Temporary file containing test URLs.
-    """
-    client = Client(url_filename=str(url_file), num_threads=2)
-    assert client.urls == URLS.strip().split('\n')
+    streamed_urls = list(client.stream_urls())
+    assert streamed_urls == expected_urls
 
 
 @patch("socket.socket")
@@ -115,12 +116,3 @@ def test_run_with_error(mock_fetch_url, url_file):
 
         for _ in urls:
             mock_print.assert_any_call("Error: Test error")
-
-
-def test_invalid_url_file():
-    """
-        Test Client initialization with an invalid file path
-        to ensure a FileNotFoundError is raised.
-        """
-    with pytest.raises(FileNotFoundError):
-        Client(url_filename="nonexistent.txt", num_threads=2)

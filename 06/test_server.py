@@ -132,10 +132,23 @@ def test_server_interaction(server):
     """
     Test that the server correctly interacts with a client and sends back word frequency data.
     """
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-        client_socket.connect(("localhost", 8080))
-        client_socket.sendall(b"http://example.com")
-        response = client_socket.recv(1024)
-        assert isinstance(response, bytes)
-        data = json.loads(response.decode())
-        assert isinstance(data, dict)
+    mock_response_text = "<html><body>word1 word2 word2 word3 word3 word3</body></html>"
+    expected_result = {"word3": 3, "word2": 2, "word1": 1}
+
+    with patch("requests.get") as mock_get:
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.text = mock_response_text
+
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
+            client_socket.connect(("localhost", 8080))
+
+            test_url = "http://example.com"
+            client_socket.sendall(test_url.encode())
+
+            response = client_socket.recv(1024)
+
+            assert isinstance(response, bytes)
+            data = json.loads(response.decode())
+            assert data == expected_result
+
+        mock_get.assert_called_with(test_url, timeout=5)
