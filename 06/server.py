@@ -71,13 +71,20 @@ class Worker(threading.Thread):
             client_socket, url = self.task_queue.get()
             if client_socket is None:
                 break
-            html_text = self.fetch_url(url)
-            if html_text:
-                word_counts = self.process_text(html_text)
-                client_socket.sendall(json.dumps(word_counts).encode())
-                self.master_server.increment_processed_urls()
-            client_socket.close()
-            self.task_queue.task_done()
+            try:
+                html_text = self.fetch_url(url)
+                if html_text:
+                    word_counts = self.process_text(html_text)
+                    client_socket.sendall(json.dumps(word_counts).encode())
+                    self.master_server.increment_processed_urls()
+                else:
+                    client_socket.sendall(b'not found')
+            except Exception as e:
+                print(f"Error occurred while processing {url=}: {e}")
+                client_socket.sendall(b'error')
+            finally:
+                client_socket.close()
+                self.task_queue.task_done()
 
 
 class MasterServer:

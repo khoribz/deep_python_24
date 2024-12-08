@@ -29,18 +29,18 @@ class Client:
         """
         self.host = host
         self.port = port
-        self.urls = self.load_urls(url_filename)
+        self.url_filename = url_filename
         self.num_threads = num_threads
 
-    def load_urls(self, filename):
+    def stream_urls(self):
         """
-        Loads URLs from a file.
+        Generator that streams URLs from the file line by line.
 
-        :param filename: The filename containing URLs
-        :return: List of URLs
+        :return: Yields URLs one at a time
         """
-        with open(filename, 'r', encoding='utf-8') as file:
-            return [line.strip() for line in file.readlines()]
+        with open(self.url_filename, 'r', encoding='utf-8') as file:
+            for line in file:
+                yield line.strip()
 
     def fetch_url(self, url):
         """
@@ -63,7 +63,7 @@ class Client:
         Submits each URL request as a separate task and waits for all to complete.
         """
         with ThreadPoolExecutor(max_workers=self.num_threads) as executor:
-            futures = [executor.submit(self.fetch_url, url) for url in self.urls]
+            futures = [executor.submit(self.fetch_url, url) for url in self.stream_urls()]
             for future in as_completed(futures):
                 try:
                     future.result()
