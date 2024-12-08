@@ -19,9 +19,13 @@ def profile_deco(func):
     def wrapper(*args, **kwargs):
         nonlocal profiler
         profiler.enable()
-        result = func(*args, **kwargs)
-        profiler.disable()
-        return result
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            print(f'error occurred during processing {func.__name__}: {e}')
+            raise
+        finally:
+            profiler.disable()
 
     def print_stat():
         nonlocal profiler, stats_stream
