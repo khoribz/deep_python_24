@@ -1,0 +1,32 @@
+2024-12-01 17:03:47,026 - DEBUG - SET - Try to set: a=1
+2024-12-01 17:03:47,026 - INFO - SET - Key added: a
+2024-12-01 17:03:47,027 - DEBUG - SET - Try to set: b=2
+2024-12-01 17:03:47,027 - INFO - SET - Key added: b
+2024-12-01 17:03:47,027 - DEBUG - GET - Try to find: a
+2024-12-01 17:03:47,027 - INFO - GET - Key accessed: a
+2024-12-01 17:03:47,027 - DEBUG - SET - Try to set: c=3
+2024-12-01 17:03:47,027 - INFO - SET - Key added: c
+2024-12-01 17:03:47,027 - DEBUG - SET - Try to set: d=4
+2024-12-01 17:03:47,027 - INFO - SET - Key added: d, Evicted least recently used key: b, value: 2
+2024-12-01 17:03:47,027 - DEBUG - GET - Try to find: b
+2024-12-01 17:03:47,027 - INFO - GET - Key not found: b
+2024-12-01 17:03:47,027 - DEBUG - SET - Try to set: a=5
+2024-12-01 17:03:47,027 - INFO - SET - Key updated: a
+2024-12-01 17:03:47,027 - DEBUG - GET - Try to find: d
+2024-12-01 17:03:47,027 - INFO - GET - Key accessed: d
+2024-12-01 17:26:27,964 - DEBUG - SET - Try to set: a=1
+2024-12-01 17:26:27,964 - INFO - SET - Key added: a
+2024-12-01 17:26:27,964 - DEBUG - SET - Try to set: b=2
+2024-12-01 17:26:27,964 - INFO - SET - Key added: b
+2024-12-01 17:26:27,964 - DEBUG - GET - Try to find: a
+2024-12-01 17:26:27,964 - INFO - GET - Key accessed: a
+2024-12-01 17:26:27,964 - DEBUG - SET - Try to set: c=3
+2024-12-01 17:26:27,964 - INFO - SET - Key added: c
+2024-12-01 17:26:27,964 - DEBUG - SET - Try to set: d=4
+2024-12-01 17:26:27,964 - INFO - SET - Key added: d, Evicted least recently used key: b, value: 2
+2024-12-01 17:26:27,964 - DEBUG - GET - Try to find: b
+2024-12-01 17:26:27,964 - INFO - GET - Key not found: b
+2024-12-01 17:26:27,964 - DEBUG - SET - Try to set: a=5
+2024-12-01 17:26:27,964 - INFO - SET - Key updated: a
+2024-12-01 17:26:27,964 - DEBUG - GET - Try to find: d
+2024-12-01 17:26:27,964 - INFO - GET - Key accessed: d
