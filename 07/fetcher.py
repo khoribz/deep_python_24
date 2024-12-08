@@ -17,10 +17,10 @@ import asyncio
 import argparse
 import aiohttp
 from aiohttp import ClientSession
-from file_reader import FileReader
 
 # Constants
 REQUEST_TIMEOUT = 1
+URL_BATCH_SIZE = 100
 
 
 class Fetcher:
@@ -28,49 +28,69 @@ class Fetcher:
     A class for asynchronously fetching data from multiple URLs with
     concurrency control for simultaneous requests.
     """
-    def __init__(self, concurrency: int, urls: list):
+    def __init__(self, concurrency: int, url_file: str):
         """
         Initializes the Fetcher with the specified concurrency level
-        and list of URLs.
+        and file path to URLs.
 
         :param concurrency: The number of simultaneous requests to allow.
-        :param urls: The list of URLs to fetch data from.
+        :param url_file: The file containing the list of URLs to fetch data from.
         """
         self.concurrency = concurrency
-        self.urls = urls
+        self.url_file = url_file
         self.semaphore = asyncio.Semaphore(concurrency)
 
-    async def fetch(self, session: ClientSession, url: str) -> aiohttp.ClientResponse:
+    async def fetch(self, session: ClientSession, url: str) -> str:
         """
         Asynchronously fetches data from a single URL with a semaphore
         limiting the number of concurrent requests.
 
         :param session: The HTTP session used for making requests.
         :param url: The URL to fetch data from.
-        :return: The response object from the HTTP request.
+        :return: The response text from the HTTP request.
         """
         async with self.semaphore:
             try:
                 async with session.get(url, timeout=REQUEST_TIMEOUT) as response:
-                    print(f'Got response: {response.status}')
-                    return response
+                    print(f'Got response: {response.status} from {url}')
+                    text = await response.text()
+                    return text
             except asyncio.TimeoutError:
-                print('Timeout error occurred.')
+                print(f'Timeout error occurred for {url}.')
                 raise
             except Exception as e:
                 print(f"Error while fetching {url}: {e}")
                 raise
 
-    async def fetch_all(self) -> list[aiohttp.ClientResponse]:
+    async def fetch_urls_in_batches(self):
         """
-        Asynchronously fetches data from all URLs in the list with
-        a limit on the number of concurrent requests.
-
-        :return: A list of responses from the HTTP requests.
+        Reads the URL file lazily, processes it in batches, and fetches data.
         """
         async with aiohttp.ClientSession() as session:
-            tasks = [self.fetch(session, url) for url in self.urls]
-            return await asyncio.gather(*tasks)
+            async for batch in self.read_urls_in_batches():
+                tasks = [self.fetch(session, url) for url in batch]
+                responses = await asyncio.gather(*tasks, return_exceptions=True)
+                for response in responses:
+                    if isinstance(response, Exception):
+                        print('exception occurred')
+                    else:
+                        print(response)
+
+    async def read_urls_in_batches(self):
+        """
+        Lazy URL reading in batches, yielding a batch of URLs at a time.
+        """
+        batch = []
+        with open(self.url_file, 'r', encoding='utf-8') as file:
+            for line in file:
+                url = line.strip()
+                if url:
+                    batch.append(url)
+                if len(batch) == URL_BATCH_SIZE:
+                    yield batch
+                    batch = []
+            if batch:
+                yield batch
 
 
 if __name__ == '__main__':
@@ -79,8 +99,7 @@ if __name__ == '__main__':
     parser.add_argument('url_file', type=str, help="File containing the list of URLs")
     args = parser.parse_args()
 
-    urls = FileReader(args.url_file).data
-    fetcher = Fetcher(concurrency=args.concurrency, urls=urls)
+    fetcher = Fetcher(concurrency=args.concurrency, url_file=args.url_file)
 
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(fetcher.fetch_all())
+    loop.run_until_complete(fetcher.fetch_urls_in_batches())

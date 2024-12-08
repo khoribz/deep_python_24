@@ -2,132 +2,136 @@
 This module contains tests for the Fetcher class, which handles asynchronous
 HTTP requests with concurrency control using aiohttp.
 """
+from unittest.mock import patch, MagicMock, call
 
 import asyncio
-from unittest.mock import patch, AsyncMock
 import pytest
+from aiohttp import ClientSession
+from aioresponses import aioresponses
+from yarl import URL
+
 from fetcher import Fetcher
-from test_data import URL_1, URL_2, URL_3
 
 
 @pytest.mark.asyncio
-async def test_empty_url_list():
-    """
-    Test that Fetcher handles an empty URL list correctly,
-    returning an empty response list without making any requests.
-    """
-    urls = []
-    with patch("aiohttp.ClientSession.get") as mock_get:
-        fetcher = Fetcher(concurrency=2, urls=urls)
-        responses = await fetcher.fetch_all()
+async def test_fetch_single_url():
+    """ Test the fetch method with a single URL """
+    fetcher = Fetcher(concurrency=1, url_file="urls.txt")
 
-    assert len(responses) == 0
-    mock_get.assert_not_called()
+    with aioresponses() as m:
+        m.get('http://google.com', status=200, body="Response from google.com")
+
+        async with ClientSession() as session:
+            result = await fetcher.fetch(session, 'http://google.com')
+            assert result == "Response from google.com"
 
 
 @pytest.mark.asyncio
-async def test_fetcher_success():
-    """
-    Test Fetcher for successful responses from multiple URLs.
-    Ensures the responses have status 200 and match the mocked responses.
-    """
-    urls = [URL_1, URL_2]
+async def test_fetch_timeout():
+    """ Test the fetch method when a timeout occurs """
+    fetcher = Fetcher(concurrency=1, url_file="urls.txt")
 
-    async def mock_text():
-        return "response text"
+    with aioresponses() as m:
+        m.get('http://example.com', exception=asyncio.TimeoutError)
 
-    mock_response_1 = AsyncMock(status=200, text=mock_text)
-    mock_response_2 = AsyncMock(status=200, text=mock_text)
-
-    mock_response_1.__aenter__.return_value = mock_response_1
-    mock_response_2.__aenter__.return_value = mock_response_2
-
-    with patch("aiohttp.ClientSession.get", side_effect=[mock_response_1, mock_response_2]):
-        fetcher = Fetcher(concurrency=2, urls=urls)
-        responses = await fetcher.fetch_all()
-
-    assert len(responses) == 2
-    assert responses[0].status == 200
-    assert responses[1].status == 200
+        async with ClientSession() as session:
+            with pytest.raises(asyncio.TimeoutError):
+                await fetcher.fetch(session, 'http://example.com')
 
 
 @pytest.mark.asyncio
-async def test_large_concurrency():
-    """
-    Test Fetcher with a large concurrency level, ensuring correct functionality
-    when the concurrency level exceeds the number of URLs.
-    """
-    urls = [URL_1, URL_2]
+async def test_fetch_urls_in_batches():
+    """ Test if the URLs are being read and fetched in batches correctly """
+    fetcher = Fetcher(concurrency=3, url_file="urls.txt")
 
-    async def mock_text():
-        return "response text"
+    urls = ['http://example.com', 'http://example.org', 'http://example.net']
 
-    mock_response_1 = AsyncMock(status=200, text=mock_text)
-    mock_response_2 = AsyncMock(status=200, text=mock_text)
+    with aioresponses() as m:
+        m.get('http://example.com', status=200, body="Response from example.com")
+        m.get('http://example.org', status=200, body="Response from example.org")
+        m.get('http://example.net', status=200, body="Response from example.net")
 
-    mock_response_1.__aenter__.return_value = mock_response_1
-    mock_response_2.__aenter__.return_value = mock_response_2
+        mock_file = MagicMock()
+        mock_file.__enter__.return_value = iter(urls)
+        mock_file.__exit__.return_value = None
 
-    with patch("aiohttp.ClientSession.get", side_effect=[mock_response_1, mock_response_2]):
-        fetcher = Fetcher(concurrency=100, urls=urls)
-        responses = await fetcher.fetch_all()
+        with patch('builtins.open', return_value=mock_file):
+            await fetcher.fetch_urls_in_batches()
 
-    assert len(responses) == 2
-    assert responses[0].status == 200
-    assert responses[1].status == 200
+            for (key, _), expected_url in zip(m.requests.items(), urls):
+                assert key[0] == 'GET'
+                assert key[1] == URL(expected_url)
 
 
 @pytest.mark.asyncio
-async def test_fetcher_timeout_error():
-    """
-    Test that Fetcher raises a TimeoutError when a request times out.
-    """
-    urls = [URL_1, URL_2]
+async def test_fetch_with_multiple_workers():
+    """ Test with multiple workers/concurrent requests """
+    fetcher = Fetcher(concurrency=2, url_file="urls.txt")
 
-    with patch("aiohttp.ClientSession.get", side_effect=asyncio.TimeoutError()):
-        fetcher = Fetcher(concurrency=1, urls=urls)
+    urls = ['http://example.com', 'http://example.org', 'http://example.net']
 
-        with pytest.raises(asyncio.TimeoutError):
-            await fetcher.fetch_all()
+    with aioresponses() as m:
+        m.get('http://example.com', status=200, body="Response from example.com")
+        m.get('http://example.org', status=200, body="Response from example.org")
+        m.get('http://example.net', status=200, body="Response from example.net")
 
+        mock_file = MagicMock()
+        mock_file.__enter__.return_value = iter(urls)
+        mock_file.__exit__.return_value = None
 
-@pytest.mark.asyncio
-async def test_fetcher_other_error():
-    """
-    Test that Fetcher raises a generic exception when an unexpected error occurs
-    during a request.
-    """
-    urls = [URL_1]
+        with patch('builtins.open', return_value=mock_file):
+            await fetcher.fetch_urls_in_batches()
 
-    with patch("aiohttp.ClientSession.get", side_effect=Exception()):
-        fetcher = Fetcher(concurrency=1, urls=urls)
-
-        with pytest.raises(Exception):
-            await fetcher.fetch_all()
+            for (key, _), expected_url in zip(m.requests.items(), urls):
+                assert key[0] == 'GET'
+                assert key[1] == URL(expected_url)
 
 
 @pytest.mark.asyncio
-async def test_fetcher_semaphore():
-    """
-    Test that Fetcher respects the concurrency limit using a semaphore.
-    Ensures the responses are correct and match the mocked values.
-    """
-    urls = [URL_1, URL_2, URL_3]
+async def test_fetch_urls_in_batches_with_error_handling():
+    """ Test one of two URL with an error handling """
+    fetcher = Fetcher(concurrency=2, url_file="urls.txt")
 
-    async def mock_text():
-        return "response text"
+    urls = ['http://example.com', 'http://example.org']
 
-    mock_response_1 = AsyncMock(status=200, text=mock_text)
-    mock_response_2 = AsyncMock(status=200, text=mock_text)
-    mock_response_3 = AsyncMock(status=200, text=mock_text)
+    with aioresponses() as m:
+        m.get('http://example.com', status=200, body="Response from example.com")
+        m.get('http://example.org', exception=Exception("Something went wrong"))
 
-    mock_response_1.__aenter__.return_value = mock_response_1
-    mock_response_2.__aenter__.return_value = mock_response_2
-    mock_response_3.__aenter__.return_value = mock_response_3
+        mock_file = MagicMock()
+        mock_file.__enter__.return_value = iter(urls)
+        mock_file.__exit__.return_value = None
 
-    with patch("aiohttp.ClientSession.get", side_effect=[mock_response_1, mock_response_2, mock_response_3]):
-        fetcher = Fetcher(concurrency=2, urls=urls)
-        responses = await fetcher.fetch_all()
+        with patch('builtins.open', return_value=mock_file):
+            with patch('builtins.print') as mock_print:
+                await fetcher.fetch_urls_in_batches()
+                assert mock_print.call_args_list == [
+                    call('Got response: 200 from http://example.com'),
+                    call('Error while fetching http://example.org: Something went wrong'),
+                    call('Response from example.com'),
+                    call('exception occurred')
+                ]
 
-    assert len(responses) == len(urls)
-    assert all(response.status == 200 for response in responses)
+            for (key, _), expected_url in zip(m.requests.items(), urls):
+                assert key[0] == 'GET'
+                assert key[1] == URL(expected_url)
+
+
+@pytest.mark.asyncio
+async def test_read_urls_in_batches():
+    """ Test the batching logic """
+    fetcher = Fetcher(concurrency=2, url_file="urls.txt")
+
+    urls = ['http://example.com', 'http://example.org', 'http://example.net', 'http://example.edu']
+
+    mock_file = MagicMock()
+    mock_file.__enter__.return_value = iter(urls)
+    mock_file.__exit__.return_value = None
+
+    with patch('fetcher.URL_BATCH_SIZE', 2), patch('builtins.open', return_value=mock_file):
+        batches = [batch async for batch in fetcher.read_urls_in_batches()]
+
+    assert batches == [
+        ['http://example.com', 'http://example.org'],
+        ['http://example.net', 'http://example.edu']
+    ]
