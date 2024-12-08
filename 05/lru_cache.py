@@ -56,14 +56,14 @@ class LRUCache:
             Returns:
                 V | None: The associated value if the key exists, or None if not.
         """
-        if (value := self.__data.get(key)) is None:
+        if key not in self.__data:
             return None
 
-        self.__data.pop(key)
+        value = self.__data.pop(key)
         self.__data[key] = value
         return value
 
-    def set(self, key: K, value: V) -> None:
+    def set(self, key: K, value: V | None) -> None:
         """
             Sets the value for a key in the cache. If the cache is full, evicts the
 
@@ -79,10 +79,9 @@ class LRUCache:
         if not isinstance(key, Hashable):
             raise TypeError(f'Unhashable type: {type(key).__name__}')
 
-        if self.__data.get(key) is not None:
+        if key in self.__data:
             self.__data.pop(key)
-            self.__data[key] = value
-        else:
-            self.__data[key] = value
-            if len(self.__data) > self.capacity:
-                self.__data.pop(next(iter(self.__data)))
+
+        self.__data[key] = value
+        if len(self.__data) > self.capacity:
+            self.__data.pop(next(iter(self.__data)))
