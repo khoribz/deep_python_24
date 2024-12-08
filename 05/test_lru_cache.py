@@ -146,9 +146,9 @@ def test_set_and_get_conditions():
 def test_data_types():
     """Test cache with various hashable key types like tuples, strings, and integers."""
     cache = LRUCache(3)
-    cache.set((1, 2), 'tuple_key')  # Using a tuple as a key
-    cache.set('string_key', 'string_value')  # Using a string as a key
-    cache.set(42, 'int_key')  # Using an integer as a key
+    cache.set((1, 2), 'tuple_key')
+    cache.set('string_key', 'string_value')
+    cache.set(42, 'int_key')
     assert cache.get((1, 2)) == 'tuple_key'
     assert cache.get('string_key') == 'string_value'
     assert cache.get(42) == 'int_key'
@@ -159,3 +159,41 @@ def test_set_unhashable_type():
     cache = LRUCache(2)
     with pytest.raises(TypeError):
         cache.set([1], 'a')
+
+
+def test_in_task():
+    """Test that is provided in the task"""
+    cache = LRUCache(2)
+
+    cache.set("k1", "val1")
+    cache.set("k2", "val2")
+
+    assert cache.get("k3") is None
+    assert cache.get("k2") == "val2"
+    assert cache.get("k1") == "val1"
+
+    cache.set("k3", "val3")
+
+    assert cache.get("k3") == "val3"
+    assert cache.get("k2") is None
+    assert cache.get("k1") == "val1"
+
+
+def test_set_and_get_none_value():
+    """Test that None can be stored and retrieved as a valid value."""
+    cache = LRUCache(2)
+    cache.set(1, None)
+    assert cache.get(1) is None
+    assert cache.get(2) is None
+
+
+def test_update_existing_key_and_eviction():
+    """Test updating an existing key and its impact on eviction."""
+    cache = LRUCache(2)
+    cache.set(1, 'a')
+    cache.set(2, 'b')
+    cache.set(1, 'updated')
+    cache.set(3, 'c')
+    assert cache.get(1) == 'updated'
+    assert cache.get(2) is None
+    assert cache.get(3) == 'c'
